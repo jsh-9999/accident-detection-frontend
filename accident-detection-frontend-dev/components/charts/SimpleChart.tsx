@@ -12,7 +12,6 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useQuery } from "@tanstack/react-query";
-import { getCookie } from 'cookies-next';
 
 ChartJS.register(
   CategoryScale,
@@ -55,8 +54,8 @@ type Props = {};
 
 export function SimpleChart({}: Props) {
   const fetchMonthlyAccidentData = async (): Promise<Record<string, number>> => {
-    const token = getCookie("Authorization");
-    const refreshToken = getCookie("Refresh");
+    const token = localStorage.getItem("Authorization");
+    const refreshToken = localStorage.getItem("Refresh");
 
     if (!token || !refreshToken) {
       throw new Error("No token found");
@@ -64,8 +63,8 @@ export function SimpleChart({}: Props) {
 
     const response = await fetch("http://backend-capstone.site:8080/api/hospital/accident/statistics/month", {
       headers: {
-        Authorization: `Bearer ${token}`,
-        Refresh: `${refreshToken}`
+        'Authorization': token,
+        'Refresh': refreshToken,
       },
       credentials: 'include',
     });

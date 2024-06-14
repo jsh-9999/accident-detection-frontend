@@ -68,7 +68,6 @@
 //   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 // };
 
-
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -82,11 +81,12 @@ export function middleware(request: NextRequest) {
   // if (path.startsWith("/auth") && token) {
   //   return NextResponse.redirect(new URL("/dashboard", request.url));
   // }
-  if (path.startsWith("/dashboard/all-datas") && (!token || !refreshToken)) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
-  }
+  // if (path.startsWith("/dashboard/all-datas") && (!token || !refreshToken)) {
+  //   return NextResponse.redirect(new URL("/auth/login", request.url));
+  // }
 }
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
+

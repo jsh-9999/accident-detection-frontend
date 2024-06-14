@@ -135,14 +135,14 @@ const Home = () => {
       console.log('Mail transmission data:', mailTransmissionData);
 
       // 이동
-      router.push('/dashboard/all-datas');
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error processing accident event:', error);
     }
   };
 
   const handleNotificationClick = () => {
-    router.push('/dashboard/all-datas');
+    router.push('/dashboard');
   };
 
   useEffect(() => {

@@ -7,8 +7,8 @@ interface MapProps {
 }
 
 const mapContainerStyle = {
-  width: "100vw",
-  height: "100vh",
+  width: "100%",
+  height: "100%", // 지도의 높이를 적절하게 설정
 };
 
 const center = {

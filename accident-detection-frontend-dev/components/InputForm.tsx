@@ -34,10 +34,12 @@ const InputForm = () => {
       return;
     }
     
-    try {
-      if (!data.videoUrl) return;
-      toast("Uploading video URL...");
+    if (!data.videoUrl) return;
+    setVideo(data.videoUrl); // 비디오 URL을 바로 설정하여 즉시 재생 가능하도록 함.
+    toast("Video URL set successfully!");
 
+    // API 요청을 비동기로 처리하여 비디오 설정 후에도 계속 진행되도록 함.
+    try {
       const authToken = localStorage.getItem("Authorization"); // Get the token from local storage
       const refreshToken = localStorage.getItem("Refresh"); // Get the refresh token from local storage
 
@@ -65,9 +67,7 @@ const InputForm = () => {
         toast.success("Video URL uploaded successfully!");
       } else if (response.redirected) {
         window.location.href = response.url;
-      } // else {
-        // toast.error("Server did not return a valid HLS URL.");
-      // }
+      }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(`An error occurred: ${error.message || "Please try again later."}`);
@@ -82,10 +82,14 @@ const InputForm = () => {
       toast.error("Please select a location on the map.");
       return;
     }
-    
-    try {
-      if (file) {
-        toast("Uploading video file...");
+
+    if (file) {
+      const videoUrl = URL.createObjectURL(file);
+      setVideo(videoUrl);
+      toast("Video file set successfully!");
+
+      // API 요청을 비동기로 처리하여 비디오 설정 후에도 계속 진행되도록 함.
+      try {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("location", JSON.stringify(location));
@@ -104,25 +108,22 @@ const InputForm = () => {
 
         if (!uploadResponse.ok) {
           toast.error("Failed to upload video.");
-        } 
-        else {
+        } else {
           const responseData = await uploadResponse.json();
           if (responseData.hls_url) {
             setVideo(responseData.hls_url); // 여기서 비디오 URL을 설정합니다.
             toast.success("Video uploaded and ready to play!");
-          }  // else {
-            //toast.error("Server did not return a valid HLS URL.");
-           // }
+          }
         }
-      } else {
-        toast.error("No file selected or invalid file type.");
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(`An error occurred: ${error.message || "Please try again later."}`);
+        } else {
+          toast.error("An unexpected error occurred. Please try again later.");
+        }
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(`An error occurred: ${error.message || "Please try again later."}`);
-      } else {
-        toast.error("An unexpected error occurred. Please try again later.");
-      }
+    } else {
+      toast.error("No file selected or invalid file type.");
     }
   };
 
@@ -143,18 +144,6 @@ const InputForm = () => {
     <div className="sm:max-w-[900px] min-h-[400px] mx-auto bg-white p-5 border rounded-md">
       <h2 className="text-2xl font-bold pb-5 text-center underline">Input Form</h2>
       <div className="flex flex-col space-y-4">
-        {video && (
-          <div className="relative w-full min-h-[200px] md:min-h-[400px] border-4 rounded-md border-dashed bg-slate-100 flex items-center justify-center">
-            <ReactPlayer 
-              url={video} 
-              playing 
-              controls 
-              width="100%" 
-              height="100%" 
-            />
-          </div>
-        )}
-
         <form onSubmit={handleSubmitUrl(onSubmitVideoUrl)} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="videoUrl" className="block text-sm font-medium text-gray-700">
@@ -198,7 +187,6 @@ const InputForm = () => {
                   const selectedFile = files[0];
                   setFile(selectedFile);
                   setFileName(selectedFile.name);
-                  // setVideo(URL.createObjectURL(selectedFile)); // 여기를 제거합니다.
                 }
               }}
             />
@@ -213,6 +201,18 @@ const InputForm = () => {
       {showMap && (
         <div style={{ width: '100%', height: '350px', marginTop: '20px' }}>
           <GoogleMap onMapClick={handleMapClick} />
+        </div>
+      )}
+
+      {video && (
+        <div className="relative w-full min-h-[200px] md:min-h-[400px] border-4 rounded-md border-dashed bg-slate-100 flex items-center justify-center mt-4">
+          <ReactPlayer 
+            url={video} 
+            playing 
+            controls 
+            width="100%" 
+            height="100%" 
+          />
         </div>
       )}
     </div>

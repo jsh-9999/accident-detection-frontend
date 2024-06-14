@@ -30,8 +30,8 @@ const fetchAccidents = async (): Promise<AllDataResponseDto[]> => {
     "http://backend-capstone.site:8080/api/hospital/accident/combination",
     {
       headers: {
-        Authorization: `${token}`,
-        Refresh: `${refreshToken}`,
+        Authorization: token,
+        Refresh: refreshToken,
       },
       credentials: "include",
     }
@@ -82,18 +82,14 @@ export default function OgDataTable({}) {
           const hospitals = Object.entries(
             info.getValue() as { [key: string]: string }
           ).map(([name, tel]) => (
-            <span
-              key={name}
-              onClick={() => handleViewDetails(name)}
-              className="cursor-pointer text-blue-500"
-            >
+            <div key={name} className="mb-2">
               {name}: {tel}
-            </span>
+            </div>
           ));
           return (
             <>
               {hospitals.reduce<React.ReactNode[]>((acc, curr, index) => {
-                if (index > 0) acc.push(", ");
+                if (index > 0) acc.push(<br key={index} />);
                 acc.push(curr);
                 return acc;
               }, [])}
@@ -117,13 +113,28 @@ export default function OgDataTable({}) {
         header: () => <span>Accuracy</span>,
         footer: () => <span>Accuracy</span>,
       },
+      {
+        id: "details",
+        cell: (info) => {
+          const accidentId = info.row.original.id;
+          const firstHospital = Object.keys(info.row.original.availableHospital)[0];
+          return (
+            <button
+              onClick={() =>
+                router.push(`/dashboard/Map?accidentId=${accidentId}&hospital=${encodeURIComponent(firstHospital)}`)
+              }
+              className="text-blue-500 underline"
+            >
+              View Details
+            </button>
+          );
+        },
+        header: () => <span>View Details</span>,
+        footer: () => <span>View Details</span>,
+      },
     ],
     []
   );
-
-  const handleViewDetails = (hospitalName: string) => {
-    router.push(`/dashboard/Map?hospital=${encodeURIComponent(hospitalName)}`);
-  };
 
   const table = useReactTable({
     data: sortedAccidents || [],
